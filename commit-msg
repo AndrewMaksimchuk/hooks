@@ -1,0 +1,76 @@
+#!/bin/node
+
+const fs = require("fs");
+const path = require("path");
+
+
+const titles = [
+    "Added",
+    "Changed",
+    "Fixed",
+    "Removed",
+    "Deprecated",
+    "Security",
+    "Performance",
+    "Other",
+    "Release",
+];
+
+
+const errorMessage = {
+    corectTitle: `The message must begin with one of the titles: ${titles}!`,
+    firstLetterAfterTitleInUppercase: "The first letter after the title must be in upper case!",
+    endWithDot: 'The message must end with a "."!',
+    main: "The commit message is not valid!",
+};
+
+
+main();
+
+
+function errorExit(msg) {
+    process.stdout.write("\033[31m" + msg + "\033[0m");
+    process.exit(1);
+}
+
+
+function getMessage(pathToCommitMessage) {
+    try {
+        const pathToCommitMessageFile = path.join(process.cwd(), pathToCommitMessage);
+        return fs.readFileSync(pathToCommitMessageFile, "utf-8");
+    } catch (error) {
+        errorExit(error);
+    }
+}
+
+
+function containeCorectTitle(msg) {
+    return titles.some((title) => msg.includes(`${title}: `)) || errorExit(errorMessage.corectTitle);
+}
+
+
+function isFirstLetterAfterTitleInUppercase(msg) {
+    const firstLetter = msg.split(":")[1].trim().charCodeAt(0);
+    return (firstLetter >= 65 && firstLetter <= 90) || firstLetter === 118 || errorExit(errorMessage.firstLetterAfterTitleInUppercase);
+}
+
+
+function isEndWithDot(msg) {
+    return (msg[msg.length - 2] === ".") || errorExit(errorMessage.endWithDot);
+}
+
+
+function checkMsg(msg) {
+    return containeCorectTitle(msg) && isFirstLetterAfterTitleInUppercase(msg) && isEndWithDot(msg);
+}
+
+
+function main() {
+    const [, , commitMsg] = process.argv;
+    if (commitMsg) {
+        const message = getMessage(commitMsg);
+        const isValid = checkMsg(message);
+        if (isValid) process.exit();
+    }
+    errorExit(errorMessage.main);
+}
