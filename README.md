@@ -1,7 +1,4 @@
-Hooks
-
-
-Git  
+#### Git  
 If you want use git hooks, then save in 'hooks' directory in project and  
 when they needed just copy to '.git/hooks' directory, like in example.  
 - commit-msg  
@@ -9,7 +6,7 @@ when they needed just copy to '.git/hooks' directory, like in example.
 
 
 
-Application  
+#### Application  
 Example of usage from 'Makefile':
 ```
 release:
